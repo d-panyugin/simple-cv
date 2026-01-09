@@ -1,4 +1,4 @@
-name: CI
+name: C++ CI with CMake
 
 on:
   push:
@@ -7,12 +7,26 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  build:
+  build-and-run:
     runs-on: ubuntu-latest
 
     steps:
-    # Шаг 1: Клонирует репозиторий
+    # Шаг 1: Загрузка кода
     - uses: actions/checkout@v4
 
-    - name: Run a one-line script
-      run: cv.cpp
+    # Шаг 2: Установка CMake (хотя обычно он уже есть, но для надежности)
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y cmake
+
+    # Шаг 3: Настройка CMake (создаем папку build)
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build
+
+    # Шаг 4: Сборка проекта (компиляция)
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build
+
+    # Шаг 5: Запуск программы
+    # Мы запускаем скомпилированный бинарник, чтобы проверить, что он работает
+    - name: Run executable
+      run: ${{github.workspace}}/build/cv_app
